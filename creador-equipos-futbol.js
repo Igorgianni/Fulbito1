@@ -116,13 +116,19 @@ function CreadorEquiposFutbol() {
     return (suma / equipo.length) / 2; // Dividimos por 2 para obtener un valor entre 0 y 5
   };
 
+  const borrarTodo = () => {
+    setJugadores([]);
+    setEquipos([]);
+    localStorage.removeItem('jugadores');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-700 to-blue-900 p-4">
       <div className="container mx-auto bg-white rounded-lg shadow-xl p-6">
         <h1 className="text-5xl font-bold mb-8 text-center text-blue-800 flex items-center justify-center">
           <span className="mr-2">⚽</span> Igor/Nico 2025 <span className="ml-2">⚽</span>
         </h1>
-        
+
         <div className="mb-8 bg-blue-100 rounded-lg shadow-md p-6 border-2 border-blue-300">
           <h2 className="text-3xl font-semibold mb-4 text-center text-blue-800">Agregar Jugador</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -184,10 +190,15 @@ function CreadorEquiposFutbol() {
         <div className="text-center mb-8">
           <button
             onClick={generarEquipos}
-            className="px-10 py-4
-bg-blue-600 text-white rounded-full hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-110 text-2xl font-bold shadow-lg"
+            className="px-10 py-4 bg-blue-600 text-white rounded-full hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-110 text-2xl font-bold shadow-lg mr-4"
           >
             Generar Equipos
+          </button>
+          <button
+            onClick={borrarTodo}
+            className="px-10 py-4 bg-red-600 text-white rounded-full hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-110 text-2xl font-bold shadow-lg"
+          >
+            Borrar Todo
           </button>
         </div>
 
