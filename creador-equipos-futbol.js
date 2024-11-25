@@ -1,5 +1,3 @@
-const { useState, useEffect } = React;
-
 const habilidades = [
   { clave: 'pase', etiqueta: 'Pase' },
   { clave: 'tiro', etiqueta: 'Tiro' },
@@ -10,8 +8,8 @@ const habilidades = [
 ];
 
 function CreadorEquiposFutbol() {
-  const [jugadores, setJugadores] = useState([]);
-  const [nuevoJugador, setNuevoJugador] = useState({
+  const [jugadores, setJugadores] = React.useState([]);
+  const [nuevoJugador, setNuevoJugador] = React.useState({
     nombre: '',
     pase: 1,
     tiro: 1,
@@ -21,37 +19,25 @@ function CreadorEquiposFutbol() {
     estadoFisico: 1,
     general: 0
   });
-  const [equipos, setEquipos] = useState([]);
-  const [jugadoresGuardados, setJugadoresGuardados] = useState([]);
+  const [equipos, setEquipos] = React.useState([]);
+  const [jugadoresGuardados, setJugadoresGuardados] = React.useState([]);
 
-  useEffect(() => {
-    try {
-      const jugadoresAlmacenados = localStorage.getItem('jugadores');
-      if (jugadoresAlmacenados) {
-        setJugadores(JSON.parse(jugadoresAlmacenados));
-      }
-      actualizarListaJugadoresGuardados();
-    } catch (error) {
-      console.error("Error al cargar jugadores:", error);
+  React.useEffect(() => {
+    const jugadoresAlmacenados = localStorage.getItem('jugadores');
+    if (jugadoresAlmacenados) {
+      setJugadores(JSON.parse(jugadoresAlmacenados));
     }
+    actualizarListaJugadoresGuardados();
   }, []);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem('jugadores', JSON.stringify(jugadores));
-      actualizarListaJugadoresGuardados();
-    } catch (error) {
-      console.error("Error al guardar jugadores:", error);
-    }
+  React.useEffect(() => {
+    localStorage.setItem('jugadores', JSON.stringify(jugadores));
+    actualizarListaJugadoresGuardados();
   }, [jugadores]);
 
   const actualizarListaJugadoresGuardados = () => {
-    try {
-      const nombres = JSON.parse(localStorage.getItem('jugadores') || '[]').map(j => j.nombre);
-      setJugadoresGuardados(nombres);
-    } catch (error) {
-      console.error("Error al actualizar lista de jugadores guardados:", error);
-    }
+    const nombres = JSON.parse(localStorage.getItem('jugadores') || '[]').map(j => j.nombre);
+    setJugadoresGuardados(nombres);
   };
 
   const manejarCambioInput = (nombre, valor) => {
@@ -109,23 +95,16 @@ function CreadorEquiposFutbol() {
     const jugadoresOrdenados = [...jugadores].sort((a, b) => b.general - a.general);
     const equipo1 = [];
     const equipo2 = [];
+    let suma1 = 0;
+    let suma2 = 0;
 
-    jugadoresOrdenados.forEach((jugador, index) => {
-      const sumaEquipo1 = equipo1.reduce((sum, j) => sum + j.general, 0);
-      const sumaEquipo2 = equipo2.reduce((sum, j) => sum + j.general, 0);
-
-      if (index % 2 === 0) {
-        if (sumaEquipo1 <= sumaEquipo2) {
-          equipo1.push(jugador);
-        } else {
-          equipo2.push(jugador);
-        }
+    jugadoresOrdenados.forEach((jugador) => {
+      if (suma1 <= suma2) {
+        equipo1.push(jugador);
+        suma1 += jugador.general;
       } else {
-        if (sumaEquipo2 <= sumaEquipo1) {
-          equipo2.push(jugador);
-        } else {
-          equipo1.push(jugador);
-        }
+        equipo2.push(jugador);
+        suma2 += jugador.general;
       }
     });
 
@@ -138,29 +117,23 @@ function CreadorEquiposFutbol() {
   };
 
   return (
-    <div className="container mx-auto p-4 bg-gradient-to-b from-green-100 to-blue-100 min-h-screen">
-      <h1 className="text-4xl font-bold mb-8 text-center text-green-800">
-        Igor/Nico 2025
-      </h1>
-
-      <div className="card mb-8 bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-semibold mb-4 text-center">Agregar o Editar Jugador</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="container">
+      <h1>Igor/Nico 2025</h1>
+      
+      <div className="card">
+        <h2>Agregar o Editar Jugador</h2>
+        <div className="grid">
           <div className="col-span-full">
-            <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-            <div className="flex gap-2">
+            <label htmlFor="nombre">Nombre</label>
+            <div className="flex">
               <input
                 id="nombre"
                 name="nombre"
                 value={nuevoJugador.nombre}
                 onChange={(e) => manejarCambioInput('nombre', e.target.value)}
                 placeholder="Nombre del jugador"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               />
-              <select
-                onChange={(e) => cargarJugador(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              >
+              <select onChange={(e) => cargarJugador(e.target.value)}>
                 <option value="">Cargar jugador</option>
                 {jugadoresGuardados.map((nombre) => (
                   <option key={nombre} value={nombre}>{nombre}</option>
@@ -170,7 +143,7 @@ function CreadorEquiposFutbol() {
           </div>
           {habilidades.map(({ clave, etiqueta }) => (
             <div key={clave}>
-              <label htmlFor={clave} className="block text-sm font-medium text-gray-700 mb-1">{etiqueta}</label>
+              <label htmlFor={clave}>{etiqueta}</label>
               <input
                 type="range"
                 id={clave}
@@ -178,39 +151,33 @@ function CreadorEquiposFutbol() {
                 max="10"
                 value={nuevoJugador[clave]}
                 onChange={(e) => manejarCambioInput(clave, e.target.value)}
-                className="w-full"
               />
-              <span className="text-sm text-gray-500 mt-1 block">
-                {nuevoJugador[clave]}
-              </span>
+              <span>{nuevoJugador[clave]}</span>
             </div>
           ))}
-          <div className="col-span-full flex justify-center mt-4">
-            <button
-              onClick={agregarJugador}
-              className="button px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-            >
+          <div className="col-span-full">
+            <button onClick={agregarJugador}>
               {jugadoresGuardados.includes(nuevoJugador.nombre) ? 'Actualizar Jugador' : 'Agregar Jugador'}
             </button>
           </div>
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8">
-        <div className="card bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-semibold mb-4 text-center">Jugadores</h2>
-          <div className="player-list overflow-y-auto h-64 border border-gray-200 rounded-md p-4">
+      <div className="grid">
+        <div className="card">
+          <h2>Jugadores</h2>
+          <div className="scroll-area">
             {jugadores.map((jugador, index) => (
-              <div key={index} className="player-item mb-4 p-4 bg-gray-50 rounded-lg shadow">
-                <h3 className="font-bold text-lg mb-2">{jugador.nombre}</h3>
-                <div className="grid grid-cols-2 gap-2">
+              <div key={index} className="jugador-card">
+                <h3>{jugador.nombre}</h3>
+                <div className="grid">
                   {habilidades.map(({ clave, etiqueta }) => (
-                    <span key={clave} className="skill-badge text-sm bg-gray-200 rounded px-2 py-1">
+                    <span key={clave} className="badge">
                       {etiqueta}: {jugador[clave]}
                     </span>
                   ))}
                 </div>
-                <span className="skill-badge overall-badge mt-2 inline-block bg-blue-500 text-white rounded px-2 py-1 text-sm">
+                <span className="badge general">
                   General: {jugador.general}
                 </span>
               </div>
@@ -218,37 +185,32 @@ function CreadorEquiposFutbol() {
           </div>
         </div>
 
-        <div className="card bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-semibold mb-4 text-center">Equipos Generados</h2>
-          <button
-            onClick={generarEquipos}
-            className="button w-full mb-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
-          >
-            Generar Equipos Equilibrados
-          </button>
+        <div className="card">
+          <h2>Equipos Generados</h2>
+          <button onClick={generarEquipos}>Generar Equipos Equilibrados</button>
           {equipos.length > 0 && (
-            <div className="team-list grid gap-4">
+            <div className="grid">
               {equipos.map((equipo, index) => (
-                <div key={index} className="team-item border border-gray-200 rounded-md p-4">
-                  <h3 className="font-semibold text-lg mb-2">Equipo {index + 1}</h3>
-                  <div className="overflow-y-auto h-48 border-t border-gray-200 pt-2">
+                <div key={index} className="card">
+                  <h3>Equipo {index + 1}</h3>
+                  <div className="scroll-area">
                     {equipo.map((jugador, jugadorIndex) => (
-                      <div key={jugadorIndex} className="mb-2 p-2 bg-gray-50 rounded">
-                        <span className="font-semibold">{jugador.nombre}</span>
-                        <div className="mt-1 grid grid-cols-2 gap-1">
+                      <div key={jugadorIndex} className="jugador-card">
+                        <span className="nombre">{jugador.nombre}</span>
+                        <div className="grid">
                           {habilidades.map(({ clave, etiqueta }) => (
-                            <span key={clave} className="text-xs bg-gray-200 rounded px-1">
+                            <span key={clave} className="badge">
                               {etiqueta}: {jugador[clave]}
                             </span>
                           ))}
-                          <span className="col-span-2 text-sm bg-blue-500 text-white rounded px-1">
+                          <span className="badge general">
                             General: {jugador.general}
                           </span>
                         </div>
                       </div>
                     ))}
                   </div>
-                  <p className="mt-2 font-bold text-center">
+                  <p className="promedio">
                     Promedio del equipo: {calcularPromedioEquipo(equipo).toFixed(2)}
                   </p>
                 </div>
@@ -261,8 +223,4 @@ function CreadorEquiposFutbol() {
   );
 }
 
-// Asegúrate de que el DOM esté completamente cargado antes de renderizar
-document.addEventListener('DOMContentLoaded', () => {
-  ReactDOM.render(<CreadorEquiposFutbol />, document.getElementById('root'));
-});
-
+ReactDOM.render(<CreadorEquiposFutbol />, document.getElementById('root'));
