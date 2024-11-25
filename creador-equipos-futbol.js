@@ -1,6 +1,4 @@
-import { Star, StarHalf } from 'lucide-react'
-import React from 'react';
-import ReactDOM from 'react-dom';
+const { useState, useEffect } = React;
 
 const habilidades = [
   { clave: 'pase', etiqueta: 'Pase', icono: '🦶' },
@@ -11,51 +9,25 @@ const habilidades = [
   { clave: 'estadoFisico', etiqueta: 'Estado Físico', icono: '🏃' }
 ];
 
-const jugadoresLegendarios = [
-  { nombre: 'Messi', imagen: 'https://upload.wikimedia.org/wikipedia/commons/b/b4/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg' },
-  { nombre: 'Maradona', imagen: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Maradona-Mundial_86_con_la_copa.JPG/640px-Maradona-Mundial_86_con_la_copa.JPG' },
-  { nombre: 'Cristiano Ronaldo', imagen: 'https://upload.wikimedia.org/wikipedia/commons/8/8c/Cristiano_Ronaldo_2018.jpg' },
-  { nombre: 'Pelé', imagen: 'https://upload.wikimedia.org/wikipedia/commons/5/5e/Pele_1960.jpg' },
-  { nombre: 'Zidane', imagen: 'https://upload.wikimedia.org/wikipedia/commons/f/f3/Zinedine_Zidane_by_Tasnim_03.jpg' },
-  { nombre: 'Ronaldinho', imagen: 'https://upload.wikimedia.org/wikipedia/commons/e/e8/Ronaldinho_in_2019.jpg' },
-  { nombre: 'Beckham', imagen: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/David_Beckham_in_2019.jpg/640px-David_Beckham_in_2019.jpg' },
-  { nombre: 'Cruyff', imagen: 'https://upload.wikimedia.org/wikipedia/commons/a/a7/Johan_Cruyff_1974.jpg' },
-  { nombre: 'Iniesta', imagen: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Andr%C3%A9s_Iniesta.jpg/640px-Andr%C3%A9s_Iniesta.jpg' },
-  { nombre: 'Xavi', imagen: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Xavi_Hernandez_2022.jpg/640px-Xavi_Hernandez_2022.jpg' },
-  { nombre: 'Neymar', imagen: 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Bra-Cos_%281%29.jpg' },
-  { nombre: 'Mbappé', imagen: 'https://upload.wikimedia.org/wikipedia/commons/5/57/2019-07-17_SG_Dynamo_Dresden_vs._Paris_Saint-Germain_by_Sandro_Halank–129_%28cropped%29.jpg' },
-  { nombre: 'Lewandowski', imagen: 'https://upload.wikimedia.org/wikipedia/commons/2/26/2019147183358_2019-05-27_Fussball_1.FC_Kaiserslautern_vs_FC_Bayern_M%C3%BCnchen_-_Sven_-_1D_X_MK_II_-_0400_-_B70I8753_%28cropped%29.jpg' },
-  { nombre: 'Benzema', imagen: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Karim_Benzema_2018.jpg' },
-  { nombre: 'Modric', imagen: 'https://upload.wikimedia.org/wikipedia/commons/e/e9/ISL-HRV_%287%29.jpg' },
-  { nombre: 'Ramos', imagen: 'https://upload.wikimedia.org/wikipedia/commons/8/88/Sergio_Ramos_2019.jpg' },
-  { nombre: 'Casillas', imagen: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Iker_Casillas_2015.jpg/640px-Iker_Casillas_2015.jpg' },
-  { nombre: 'Pirlo', imagen: 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Andrea_Pirlo_Italy_vs_Chile_2013.jpg' },
-  { nombre: 'Buffon', imagen: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Gianluigi_Buffon_%2831784615942%29.jpg/640px-Gianluigi_Buffon_%2831784615942%29.jpg' },
-  { nombre: 'Kaka', imagen: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Kak%C3%A1_visited_Stadium_St._Petersburg.jpg/640px-Kak%C3%A1_visited_Stadium_St._Petersburg.jpg' }
-];
-
-function StarRating({ rating, maxRating = 5 }) {
-  const fullStars = Math.floor(rating);
-  const hasHalfStar = rating % 1 >= 0.5;
-
+const RenderEstrellas = ({ rating }) => {
+  const estrellas = Math.round(rating * 2) / 2; // Redondear a 0.5 más cercano
   return (
     <div className="flex">
-      {[...Array(maxRating)].map((_, i) => {
-        if (i < fullStars) {
-          return <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />;
-        } else if (i === fullStars && hasHalfStar) {
-          return <StarHalf key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />;
-        } else {
-          return <Star key={i} className="w-5 h-5 text-gray-300" />;
-        }
+      {[...Array(5)].map((_, index) => {
+        const starValue = index + 1;
+        return (
+          <span key={index} className="text-yellow-400 text-2xl">
+            {estrellas >= starValue ? '★' : estrellas >= starValue - 0.5 ? '⯨' : '☆'}
+          </span>
+        );
       })}
     </div>
   );
-}
+};
 
-function App() {
-  const [jugadores, setJugadores] = React.useState([]);
-  const [nuevoJugador, setNuevoJugador] = React.useState({
+function CreadorEquiposFutbol() {
+  const [jugadores, setJugadores] = useState([]);
+  const [nuevoJugador, setNuevoJugador] = useState({
     nombre: '',
     pase: 5,
     tiro: 5,
@@ -64,30 +36,54 @@ function App() {
     arquero: 5,
     estadoFisico: 5,
   });
-  const [equipos, setEquipos] = React.useState([]);
+  const [equipos, setEquipos] = useState([]);
+  const [userId, setUserId] = useState(null);
 
-  React.useEffect(() => {
-    const jugadoresGuardados = localStorage.getItem('jugadores');
-    if (jugadoresGuardados) {
-      setJugadores(JSON.parse(jugadoresGuardados));
-    } else {
-      fetch('jugadores.json')
-        .then(response => response.json())
-        .then(data => {
-          const jugadoresConImagen = data.jugadores.map(jugador => ({
-            ...jugador,
-            imagen: jugadoresLegendarios[Math.floor(Math.random() * jugadoresLegendarios.length)].imagen
-          }));
-          setJugadores(jugadoresConImagen);
-          localStorage.setItem('jugadores', JSON.stringify(jugadoresConImagen));
-        })
-        .catch(error => console.error('Error al cargar los jugadores:', error));
-    }
+  useEffect(() => {
+    auth.signInAnonymously()
+      .then(() => {
+        console.log("Usuario autenticado anónimamente");
+      })
+      .catch((error) => {
+        console.error("Error de autenticación:", error);
+      });
+
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUserId(user.uid);
+        cargarJugadores();
+      } else {
+        setUserId(null);
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  React.useEffect(() => {
-    localStorage.setItem('jugadores', JSON.stringify(jugadores));
-  }, [jugadores]);
+  const cargarJugadores = () => {
+    const jugadoresRef = database.ref('jugadores');
+    jugadoresRef.on('value', (snapshot) => {
+      if (snapshot.exists()) {
+        const jugadoresData = snapshot.val();
+        const jugadoresArray = Object.keys(jugadoresData).map(key => ({
+          id: key,
+          ...jugadoresData[key],
+          general: calcularPromedio(jugadoresData[key])
+        }));
+        setJugadores(jugadoresArray);
+      }
+    });
+  };
+
+  const calcularPromedio = (jugador) => {
+    const habilidades = ['pase', 'tiro', 'regate', 'defensa', 'arquero', 'estadoFisico'];
+    const suma = habilidades.reduce((acc, hab) => {
+      const calificaciones = Object.values(jugador[hab] || {});
+      const promedio = calificaciones.length > 0 ? calificaciones.reduce((a, b) => a + b, 0) / calificaciones.length : 0;
+      return acc + promedio;
+    }, 0);
+    return Math.round((suma / habilidades.length) * 10) / 10;
+  };
 
   const manejarCambioInput = (nombre, valor) => {
     setNuevoJugador(prev => ({
@@ -97,54 +93,67 @@ function App() {
   };
 
   const agregarJugador = () => {
-    if (nuevoJugador.nombre) {
-      const jugadorConImagen = {
-        ...nuevoJugador,
-        imagen: jugadoresLegendarios[Math.floor(Math.random() * jugadoresLegendarios.length)].imagen
-      };
-      setJugadores(prev => [...prev, jugadorConImagen]);
-      setNuevoJugador({
-        nombre: '',
-        pase: 5,
-        tiro: 5,
-        regate: 5,
-        defensa: 5,
-        arquero: 5,
-        estadoFisico: 5,
+    if (nuevoJugador.nombre && userId) {
+      const jugadorRef = database.ref(`jugadores/${nuevoJugador.nombre}`);
+      const nuevoJugadorData = {};
+      habilidades.forEach(({ clave }) => {
+        nuevoJugadorData[clave] = { [userId]: nuevoJugador[clave] };
       });
+      jugadorRef.set(nuevoJugadorData)
+        .then(() => {
+          console.log("Jugador agregado con éxito");
+          setNuevoJugador({
+            nombre: '',
+            pase: 5,
+            tiro: 5,
+            regate: 5,
+            defensa: 5,
+            arquero: 5,
+            estadoFisico: 5,
+          });
+        })
+        .catch((error) => {
+          console.error("Error al agregar jugador:", error);
+        });
     }
   };
 
-  const calcularPromedioJugador = (jugador) => {
-    const habilidades = ['pase', 'tiro', 'regate', 'defensa', 'arquero', 'estadoFisico'];
-    const suma = habilidades.reduce((acc, hab) => acc + jugador[hab], 0);
-    return suma / habilidades.length;
-  };
-
-  const calcularPromedioEquipo = (equipo) => {
-    const suma = equipo.reduce((acc, jugador) => acc + calcularPromedioJugador(jugador), 0);
-    return equipo.length > 0 ? suma / equipo.length : 0;
-  };
-
-  const calcularProbabilidadGanar = (equipo, totalEquipos) => {
-    const promedioEquipo = calcularPromedioEquipo(equipo);
-    return Math.round((promedioEquipo / 10) * 100);
+  const actualizarCalificacion = (jugadorId, habilidad, valor) => {
+    if (userId) {
+      const jugadorRef = database.ref(`jugadores/${jugadorId}/${habilidad}/${userId}`);
+      jugadorRef.set(valor)
+        .then(() => {
+          console.log("Calificación actualizada con éxito");
+        })
+        .catch((error) => {
+          console.error("Error al actualizar calificación:", error);
+        });
+    }
   };
 
   const generarEquipos = () => {
-    const jugadoresOrdenados = [...jugadores].sort((a, b) => calcularPromedioJugador(b) - calcularPromedioJugador(a));
+    const jugadoresOrdenados = [...jugadores].sort((a, b) => b.general - a.general);
     const equipo1 = [];
     const equipo2 = [];
+    let suma1 = 0;
+    let suma2 = 0;
 
-    jugadoresOrdenados.forEach((jugador, index) => {
-      if (index % 2 === 0) {
+    jugadoresOrdenados.forEach((jugador) => {
+      if (suma1 <= suma2) {
         equipo1.push(jugador);
+        suma1 += jugador.general;
       } else {
         equipo2.push(jugador);
+        suma2 += jugador.general;
       }
     });
 
     setEquipos([equipo1, equipo2]);
+  };
+
+  const calcularPromedioEquipo = (equipo) => {
+    const suma = equipo.reduce((acc, jugador) => acc + jugador.general, 0);
+    return equipo.length > 0 ? (suma / equipo.length) / 20 : 0; // Dividimos por 20 para obtener un valor entre 0 y 5
   };
 
   return (
@@ -155,7 +164,7 @@ function App() {
         </h1>
 
         <div className="mb-8 bg-blue-100 rounded-lg shadow-md p-6 border-2 border-blue-300">
-          <h2 className="text-3xl font-semibold mb-4 text-center text-blue-800">Agregar Jugador</h2>
+          <h2 className="text-3xl font-semibold mb-4 text-center text-blue-800">Agregar o Calificar Jugador</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="col-span-full">
               <label htmlFor="nombre" className="block text-lg font-medium text-blue-700 mb-1">Nombre del Jugador</label>
@@ -192,7 +201,7 @@ function App() {
                 onClick={agregarJugador}
                 className="px-8 py-3 bg-yellow-400 text-blue-900 rounded-full hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-110 text-xl font-bold shadow-lg"
               >
-                Agregar Jugador
+                Agregar / Actualizar Jugador
               </button>
             </div>
           </div>
@@ -200,23 +209,24 @@ function App() {
 
         <div className="bg-blue-100 rounded-lg shadow-md p-6 mb-8 border-2 border-blue-300">
           <h2 className="text-3xl font-semibold mb-4 text-center text-blue-800">Jugadores</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {jugadores.map((jugador, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-lg p-4 hover:shadow-xl transition duration-300 ease-in-out flex flex-col items-center justify-center border-2 border-blue-200">
-                <div className="w-24 h-24 rounded-full overflow-hidden mb-2 border-4 border-yellow-400">
-                  <img src={jugador.imagen} alt={jugador.nombre} className="w-full h-full object-cover" />
-                </div>
-                <h3 className="font-bold text-lg text-center text-blue-800">{jugador.nombre}</h3>
-                <div className="mt-2 text-sm text-gray-600">
-                  {habilidades.map(({ clave, icono }) => (
-                    <div key={clave}>
-                      {icono} {jugador[clave]}
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-2">
-                  <StarRating rating={calcularPromedioJugador(jugador) / 2} />
-                </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {jugadores.map((jugador) => (
+              <div key={jugador.id} className="bg-white rounded-lg shadow-lg p-4 hover:shadow-xl transition duration-300 ease-in-out flex flex-col items-center justify-center border-2 border-blue-200">
+                <h3 className="font-bold text-lg text-center text-blue-800 mb-2">{jugador.id}</h3>
+                {habilidades.map(({ clave, etiqueta, icono }) => (
+                  <div key={clave} className="flex items-center justify-between w-full mb-2">
+                    <span>{icono} {etiqueta}:</span>
+                    <input
+                      type="number"
+                      min="1"
+                      max="10"
+                      value={jugador[clave][userId] || 5}
+                      onChange={(e) => actualizarCalificacion(jugador.id, clave, parseInt(e.target.value))}
+                      className="w-16 text-center border rounded"
+                    />
+                  </div>
+                ))}
+                <div className="font-bold mt-2">General: {jugador.general}</div>
               </div>
             ))}
           </div>
@@ -236,19 +246,15 @@ function App() {
             {equipos.map((equipo, equipoIndex) => (
               <div key={equipoIndex} className="bg-blue-100 rounded-lg shadow-md p-6 border-2 border-blue-300">
                 <h2 className="text-3xl font-semibold mb-4 text-center text-blue-800">Equipo {equipoIndex + 1}</h2>
-                <div className="mb-4">
+                <div className="mb-4 flex flex-col items-center">
                   <p className="text-lg font-semibold text-blue-800">Promedio del equipo:</p>
-                  <StarRating rating={calcularPromedioEquipo(equipo) / 2} />
-                </div>
-                <div className="mb-4">
-                  <p className="text-lg font-semibold text-blue-800">Probabilidad de ganar:</p>
-                  <p className="text-2xl font-bold text-green-600">{calcularProbabilidadGanar(equipo, equipos.length)}%</p>
+                  <RenderEstrellas rating={calcularPromedioEquipo(equipo)} />
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {equipo.map((jugador, jugadorIndex) => (
                     <div key={jugadorIndex} className="bg-white rounded-lg shadow-lg p-4 hover:shadow-xl transition duration-300 ease-in-out flex flex-col items-center justify-center border-2 border-blue-200">
                       <div className="w-16 h-16 rounded-full overflow-hidden mb-2 border-2 border-yellow-400">
-                        <img src={jugador.imagen} alt={jugador.nombre} className="w-full h-full object-cover" />
+                        <ImagenJugador src={jugador.imagen} alt={jugador.nombre} className="w-full h-full object-cover" />
                       </div>
                       <h3 className="font-bold text-sm text-center text-blue-800">{jugador.nombre}</h3>
                     </div>
@@ -263,5 +269,5 @@ function App() {
   );
 }
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(<CreadorEquiposFutbol />, document.getElementById('root'));
 
