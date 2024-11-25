@@ -142,8 +142,8 @@ function CreadorEquiposFutbol() {
       <h1 className="text-4xl font-bold mb-8 text-center text-green-800">
         Igor/Nico 2025
       </h1>
-      
-      <div className="mb-8 bg-white rounded-lg shadow-lg p-6">
+
+      <div className="card mb-8 bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-2xl font-semibold mb-4 text-center">Agregar o Editar Jugador</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="col-span-full">
@@ -188,7 +188,7 @@ function CreadorEquiposFutbol() {
           <div className="col-span-full flex justify-center mt-4">
             <button
               onClick={agregarJugador}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              className="button px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
             >
               {jugadoresGuardados.includes(nuevoJugador.nombre) ? 'Actualizar Jugador' : 'Agregar Jugador'}
             </button>
@@ -197,20 +197,20 @@ function CreadorEquiposFutbol() {
       </div>
 
       <div className="grid md:grid-cols-2 gap-8">
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="card bg-white rounded-lg shadow-lg p-6">
           <h2 className="text-2xl font-semibold mb-4 text-center">Jugadores</h2>
-          <div className="overflow-y-auto h-64 border border-gray-200 rounded-md p-4">
+          <div className="player-list overflow-y-auto h-64 border border-gray-200 rounded-md p-4">
             {jugadores.map((jugador, index) => (
-              <div key={index} className="mb-4 p-4 bg-gray-50 rounded-lg shadow">
+              <div key={index} className="player-item mb-4 p-4 bg-gray-50 rounded-lg shadow">
                 <h3 className="font-bold text-lg mb-2">{jugador.nombre}</h3>
                 <div className="grid grid-cols-2 gap-2">
                   {habilidades.map(({ clave, etiqueta }) => (
-                    <span key={clave} className="text-sm bg-gray-200 rounded px-2 py-1">
+                    <span key={clave} className="skill-badge text-sm bg-gray-200 rounded px-2 py-1">
                       {etiqueta}: {jugador[clave]}
                     </span>
                   ))}
                 </div>
-                <span className="mt-2 inline-block bg-blue-500 text-white rounded px-2 py-1 text-sm">
+                <span className="skill-badge overall-badge mt-2 inline-block bg-blue-500 text-white rounded px-2 py-1 text-sm">
                   General: {jugador.general}
                 </span>
               </div>
@@ -218,18 +218,18 @@ function CreadorEquiposFutbol() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="card bg-white rounded-lg shadow-lg p-6">
           <h2 className="text-2xl font-semibold mb-4 text-center">Equipos Generados</h2>
           <button
             onClick={generarEquipos}
-            className="w-full mb-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+            className="button w-full mb-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
           >
             Generar Equipos Equilibrados
           </button>
           {equipos.length > 0 && (
-            <div className="grid gap-4">
+            <div className="team-list grid gap-4">
               {equipos.map((equipo, index) => (
-                <div key={index} className="border border-gray-200 rounded-md p-4">
+                <div key={index} className="team-item border border-gray-200 rounded-md p-4">
                   <h3 className="font-semibold text-lg mb-2">Equipo {index + 1}</h3>
                   <div className="overflow-y-auto h-48 border-t border-gray-200 pt-2">
                     {equipo.map((jugador, jugadorIndex) => (
