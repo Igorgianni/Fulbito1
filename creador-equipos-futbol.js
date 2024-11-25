@@ -1,3 +1,5 @@
+console.log("Script is running");
+
 const { useState, useEffect } = React;
 
 const habilidades = [
@@ -10,6 +12,7 @@ const habilidades = [
 ];
 
 function CreadorEquiposFutbol() {
+  console.log("Component is rendering");
   const [jugadores, setJugadores] = useState([]);
   const [nuevoJugador, setNuevoJugador] = useState({
     nombre: '',
@@ -21,38 +24,14 @@ function CreadorEquiposFutbol() {
     estadoFisico: 1,
     general: 0
   });
-  const [equipos, setEquipos] = useState([]);
-  const [jugadoresGuardados, setJugadoresGuardados] = useState([]);
 
   useEffect(() => {
-    try {
-      const jugadoresAlmacenados = localStorage.getItem('jugadores');
-      if (jugadoresAlmacenados) {
-        setJugadores(JSON.parse(jugadoresAlmacenados));
-      }
-      actualizarListaJugadoresGuardados();
-    } catch (error) {
-      console.error("Error al cargar jugadores:", error);
+    console.log("useEffect is running");
+    const jugadoresGuardados = localStorage.getItem('jugadores');
+    if (jugadoresGuardados) {
+      setJugadores(JSON.parse(jugadoresGuardados));
     }
   }, []);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('jugadores', JSON.stringify(jugadores));
-      actualizarListaJugadoresGuardados();
-    } catch (error) {
-      console.error("Error al guardar jugadores:", error);
-    }
-  }, [jugadores]);
-
-  const actualizarListaJugadoresGuardados = () => {
-    try {
-      const nombres = JSON.parse(localStorage.getItem('jugadores') || '[]').map(j => j.nombre);
-      setJugadoresGuardados(nombres);
-    } catch (error) {
-      console.error("Error al actualizar lista de jugadores guardados:", error);
-    }
-  };
 
   const manejarCambioInput = (nombre, valor) => {
     setNuevoJugador(prev => {
@@ -64,25 +43,8 @@ function CreadorEquiposFutbol() {
   };
 
   const agregarJugador = () => {
-    if (
-      nuevoJugador.nombre &&
-      nuevoJugador.pase >= 1 && nuevoJugador.pase <= 10 &&
-      nuevoJugador.tiro >= 1 && nuevoJugador.tiro <= 10 &&
-      nuevoJugador.regate >= 1 && nuevoJugador.regate <= 10 &&
-      nuevoJugador.defensa >= 1 && nuevoJugador.defensa <= 10 &&
-      nuevoJugador.arquero >= 1 && nuevoJugador.arquero <= 10 &&
-      nuevoJugador.estadoFisico >= 1 && nuevoJugador.estadoFisico <= 10
-    ) {
-      setJugadores(prev => {
-        const index = prev.findIndex(j => j.nombre === nuevoJugador.nombre);
-        if (index !== -1) {
-          const nuevosJugadores = [...prev];
-          nuevosJugadores[index] = nuevoJugador;
-          return nuevosJugadores;
-        } else {
-          return [...prev, nuevoJugador];
-        }
-      });
+    if (nuevoJugador.nombre) {
+      setJugadores(prev => [...prev, nuevoJugador]);
       setNuevoJugador({
         nombre: '',
         pase: 1,
@@ -93,80 +55,26 @@ function CreadorEquiposFutbol() {
         estadoFisico: 1,
         general: 0
       });
-    } else {
-      alert('Por favor, asegúrate de que todas las habilidades estén entre 1 y 10.');
     }
-  };
-
-  const cargarJugador = (nombre) => {
-    const jugadorCargado = jugadores.find(j => j.nombre === nombre);
-    if (jugadorCargado) {
-      setNuevoJugador(jugadorCargado);
-    }
-  };
-
-  const generarEquipos = () => {
-    const jugadoresOrdenados = [...jugadores].sort((a, b) => b.general - a.general);
-    const equipo1 = [];
-    const equipo2 = [];
-
-    jugadoresOrdenados.forEach((jugador, index) => {
-      const sumaEquipo1 = equipo1.reduce((sum, j) => sum + j.general, 0);
-      const sumaEquipo2 = equipo2.reduce((sum, j) => sum + j.general, 0);
-
-      if (index % 2 === 0) {
-        if (sumaEquipo1 <= sumaEquipo2) {
-          equipo1.push(jugador);
-        } else {
-          equipo2.push(jugador);
-        }
-      } else {
-        if (sumaEquipo2 <= sumaEquipo1) {
-          equipo2.push(jugador);
-        } else {
-          equipo1.push(jugador);
-        }
-      }
-    });
-
-    setEquipos([equipo1, equipo2]);
-  };
-
-  const calcularPromedioEquipo = (equipo) => {
-    const suma = equipo.reduce((acc, jugador) => acc + jugador.general, 0);
-    return equipo.length > 0 ? suma / equipo.length : 0;
   };
 
   return (
-    <div className="container mx-auto p-4 bg-gradient-to-b from-green-100 to-blue-100 min-h-screen">
-      <h1 className="text-4xl font-bold mb-8 text-center text-green-800">
-        Igor/Nico 2025
-      </h1>
-
-      <div className="card mb-8 bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-semibold mb-4 text-center">Agregar o Editar Jugador</h2>
+    <div className="container mx-auto p-4">
+      <h1 className="text-4xl font-bold mb-8 text-center">Igor/Nico 2025</h1>
+      
+      <div className="mb-8 bg-white rounded-lg shadow-lg p-6">
+        <h2 className="text-2xl font-semibold mb-4 text-center">Agregar Jugador</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="col-span-full">
             <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-            <div className="flex gap-2">
-              <input
-                id="nombre"
-                name="nombre"
-                value={nuevoJugador.nombre}
-                onChange={(e) => manejarCambioInput('nombre', e.target.value)}
-                placeholder="Nombre del jugador"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              />
-              <select
-                onChange={(e) => cargarJugador(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              >
-                <option value="">Cargar jugador</option>
-                {jugadoresGuardados.map((nombre) => (
-                  <option key={nombre} value={nombre}>{nombre}</option>
-                ))}
-              </select>
-            </div>
+            <input
+              id="nombre"
+              name="nombre"
+              value={nuevoJugador.nombre}
+              onChange={(e) => manejarCambioInput('nombre', e.target.value)}
+              placeholder="Nombre del jugador"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            />
           </div>
           {habilidades.map(({ clave, etiqueta }) => (
             <div key={clave}>
@@ -188,81 +96,38 @@ function CreadorEquiposFutbol() {
           <div className="col-span-full flex justify-center mt-4">
             <button
               onClick={agregarJugador}
-              className="button px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
             >
-              {jugadoresGuardados.includes(nuevoJugador.nombre) ? 'Actualizar Jugador' : 'Agregar Jugador'}
+              Agregar Jugador
             </button>
           </div>
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8">
-        <div className="card bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-semibold mb-4 text-center">Jugadores</h2>
-          <div className="player-list overflow-y-auto h-64 border border-gray-200 rounded-md p-4">
-            {jugadores.map((jugador, index) => (
-              <div key={index} className="player-item mb-4 p-4 bg-gray-50 rounded-lg shadow">
-                <h3 className="font-bold text-lg mb-2">{jugador.nombre}</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {habilidades.map(({ clave, etiqueta }) => (
-                    <span key={clave} className="skill-badge text-sm bg-gray-200 rounded px-2 py-1">
-                      {etiqueta}: {jugador[clave]}
-                    </span>
-                  ))}
-                </div>
-                <span className="skill-badge overall-badge mt-2 inline-block bg-blue-500 text-white rounded px-2 py-1 text-sm">
-                  General: {jugador.general}
-                </span>
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <h2 className="text-2xl font-semibold mb-4 text-center">Jugadores</h2>
+        <div className="overflow-y-auto h-64 border border-gray-200 rounded-md p-4">
+          {jugadores.map((jugador, index) => (
+            <div key={index} className="mb-4 p-4 bg-gray-50 rounded-lg shadow">
+              <h3 className="font-bold text-lg mb-2">{jugador.nombre}</h3>
+              <div className="grid grid-cols-2 gap-2">
+                {habilidades.map(({ clave, etiqueta }) => (
+                  <span key={clave} className="text-sm bg-gray-200 rounded px-2 py-1">
+                    {etiqueta}: {jugador[clave]}
+                  </span>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="card bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-semibold mb-4 text-center">Equipos Generados</h2>
-          <button
-            onClick={generarEquipos}
-            className="button w-full mb-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
-          >
-            Generar Equipos Equilibrados
-          </button>
-          {equipos.length > 0 && (
-            <div className="team-list grid gap-4">
-              {equipos.map((equipo, index) => (
-                <div key={index} className="team-item border border-gray-200 rounded-md p-4">
-                  <h3 className="font-semibold text-lg mb-2">Equipo {index + 1}</h3>
-                  <div className="overflow-y-auto h-48 border-t border-gray-200 pt-2">
-                    {equipo.map((jugador, jugadorIndex) => (
-                      <div key={jugadorIndex} className="mb-2 p-2 bg-gray-50 rounded">
-                        <span className="font-semibold">{jugador.nombre}</span>
-                        <div className="mt-1 grid grid-cols-2 gap-1">
-                          {habilidades.map(({ clave, etiqueta }) => (
-                            <span key={clave} className="text-xs bg-gray-200 rounded px-1">
-                              {etiqueta}: {jugador[clave]}
-                            </span>
-                          ))}
-                          <span className="col-span-2 text-sm bg-blue-500 text-white rounded px-1">
-                            General: {jugador.general}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="mt-2 font-bold text-center">
-                    Promedio del equipo: {calcularPromedioEquipo(equipo).toFixed(2)}
-                  </p>
-                </div>
-              ))}
+              <span className="mt-2 inline-block bg-blue-500 text-white rounded px-2 py-1 text-sm">
+                General: {jugador.general}
+              </span>
             </div>
-          )}
+          ))}
         </div>
       </div>
     </div>
   );
 }
 
-// Asegúrate de que el DOM esté completamente cargado antes de renderizar
-document.addEventListener('DOMContentLoaded', () => {
-  ReactDOM.render(<CreadorEquiposFutbol />, document.getElementById('root'));
-});
+ReactDOM.render(<CreadorEquiposFutbol />, document.getElementById('root'));
+console.log("Render attempt completed");
 
