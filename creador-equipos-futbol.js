@@ -1,23 +1,12 @@
-"use client"
-
-import React, { useState, useEffect } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Slider } from "@/components/ui/slider"
-import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ClubIcon as Soccer, User, Trophy } from 'lucide-react'
+const { useState, useEffect } = React;
 
 const habilidades = [
-  { clave: 'pase', etiqueta: 'Pase', icono: <Soccer className="w-4 h-4" /> },
-  { clave: 'tiro', etiqueta: 'Tiro', icono: <Soccer className="w-4 h-4" /> },
-  { clave: 'regate', etiqueta: 'Regate', icono: <Soccer className="w-4 h-4" /> },
-  { clave: 'defensa', etiqueta: 'Defensa', icono: <Soccer className="w-4 h-4" /> },
-  { clave: 'arquero', etiqueta: 'Arquero', icono: <Soccer className="w-4 h-4" /> },
-  { clave: 'estadoFisico', etiqueta: 'Estado Físico', icono: <User className="w-4 h-4" /> }
+  { clave: 'pase', etiqueta: 'Pase' },
+  { clave: 'tiro', etiqueta: 'Tiro' },
+  { clave: 'regate', etiqueta: 'Regate' },
+  { clave: 'defensa', etiqueta: 'Defensa' },
+  { clave: 'arquero', etiqueta: 'Arquero' },
+  { clave: 'estadoFisico', etiqueta: 'Estado Físico' }
 ];
 
 function CreadorEquiposFutbol() {
@@ -138,148 +127,128 @@ function CreadorEquiposFutbol() {
 
   return (
     <div className="container mx-auto p-4 bg-gradient-to-b from-green-100 to-blue-100 min-h-screen">
-      <h1 className="text-4xl font-bold mb-8 text-center text-green-800 flex items-center justify-center">
-        <Soccer className="w-10 h-10 mr-2" />
+      <h1 className="text-4xl font-bold mb-8 text-center text-green-800">
         Igor/Nico 2025
       </h1>
       
-      <Card className="mb-8 shadow-lg bg-white/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">Agregar o Editar Jugador</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="col-span-full">
-              <Label htmlFor="nombre">Nombre</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="nombre"
-                  name="nombre"
-                  value={nuevoJugador.nombre}
-                  onChange={(e) => manejarCambioInput('nombre', e.target.value)}
-                  placeholder="Nombre del jugador"
-                  className="mt-1"
-                />
-                <Select onValueChange={cargarJugador}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Cargar jugador" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {jugadoresGuardados.map((nombre) => (
-                      <SelectItem key={nombre} value={nombre}>{nombre}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+      <div className="mb-8 bg-white rounded-lg shadow-lg p-6">
+        <h2 className="text-2xl font-semibold mb-4 text-center">Agregar o Editar Jugador</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="col-span-full">
+            <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+            <div className="flex gap-2">
+              <input
+                id="nombre"
+                name="nombre"
+                value={nuevoJugador.nombre}
+                onChange={(e) => manejarCambioInput('nombre', e.target.value)}
+                placeholder="Nombre del jugador"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              />
+              <select
+                onChange={(e) => cargarJugador(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              >
+                <option value="">Cargar jugador</option>
+                {jugadoresGuardados.map((nombre) => (
+                  <option key={nombre} value={nombre}>{nombre}</option>
+                ))}
+              </select>
             </div>
-            {habilidades.map(({ clave, etiqueta, icono }) => (
-              <div key={clave}>
-                <Label htmlFor={clave} className="flex items-center">
-                  {icono}
-                  <span className="ml-2">{etiqueta}</span>
-                </Label>
-                <Slider
-                  id={clave}
-                  min={1}
-                  max={10}
-                  step={1}
-                  value={[nuevoJugador[clave]]}
-                  onValueChange={(value) => manejarCambioInput(clave, value[0])}
-                  className="mt-2"
-                />
-                <span className="text-sm text-gray-500 mt-1 block">
-                  {nuevoJugador[clave]}
+          </div>
+          {habilidades.map(({ clave, etiqueta }) => (
+            <div key={clave}>
+              <label htmlFor={clave} className="block text-sm font-medium text-gray-700 mb-1">{etiqueta}</label>
+              <input
+                type="range"
+                id={clave}
+                min="1"
+                max="10"
+                value={nuevoJugador[clave]}
+                onChange={(e) => manejarCambioInput(clave, e.target.value)}
+                className="w-full"
+              />
+              <span className="text-sm text-gray-500 mt-1 block">
+                {nuevoJugador[clave]}
+              </span>
+            </div>
+          ))}
+          <div className="col-span-full flex justify-center mt-4">
+            <button
+              onClick={agregarJugador}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            >
+              {jugadoresGuardados.includes(nuevoJugador.nombre) ? 'Actualizar Jugador' : 'Agregar Jugador'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-8">
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <h2 className="text-2xl font-semibold mb-4 text-center">Jugadores</h2>
+          <div className="overflow-y-auto h-64 border border-gray-200 rounded-md p-4">
+            {jugadores.map((jugador, index) => (
+              <div key={index} className="mb-4 p-4 bg-gray-50 rounded-lg shadow">
+                <h3 className="font-bold text-lg mb-2">{jugador.nombre}</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {habilidades.map(({ clave, etiqueta }) => (
+                    <span key={clave} className="text-sm bg-gray-200 rounded px-2 py-1">
+                      {etiqueta}: {jugador[clave]}
+                    </span>
+                  ))}
+                </div>
+                <span className="mt-2 inline-block bg-blue-500 text-white rounded px-2 py-1 text-sm">
+                  General: {jugador.general}
                 </span>
               </div>
             ))}
-            <div className="col-span-full flex justify-center mt-4">
-              <Button onClick={agregarJugador} className="w-full md:w-auto">
-                {jugadoresGuardados.includes(nuevoJugador.nombre) ? 'Actualizar Jugador' : 'Agregar Jugador'}
-              </Button>
-            </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      <div className="grid md:grid-cols-2 gap-8">
-        <Card className="shadow-lg bg-white/80 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-2xl text-center flex items-center justify-center">
-              <User className="w-6 h-6 mr-2" />
-              Jugadores
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[300px] w-full rounded-md border p-4">
-              {jugadores.map((jugador, index) => (
-                <div key={index} className="mb-4 p-4 bg-green-50 rounded-lg shadow">
-                  <h3 className="font-bold text-lg mb-2">{jugador.nombre}</h3>
-                  <div className="grid grid-cols-2 gap-2">
-                    {habilidades.map(({ clave, etiqueta, icono }) => (
-                      <Badge key={clave} variant="secondary" className="text-xs flex items-center">
-                        {icono}
-                        <span className="ml-1">{etiqueta}: {jugador[clave]}</span>
-                      </Badge>
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <h2 className="text-2xl font-semibold mb-4 text-center">Equipos Generados</h2>
+          <button
+            onClick={generarEquipos}
+            className="w-full mb-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+          >
+            Generar Equipos Equilibrados
+          </button>
+          {equipos.length > 0 && (
+            <div className="grid gap-4">
+              {equipos.map((equipo, index) => (
+                <div key={index} className="border border-gray-200 rounded-md p-4">
+                  <h3 className="font-semibold text-lg mb-2">Equipo {index + 1}</h3>
+                  <div className="overflow-y-auto h-48 border-t border-gray-200 pt-2">
+                    {equipo.map((jugador, jugadorIndex) => (
+                      <div key={jugadorIndex} className="mb-2 p-2 bg-gray-50 rounded">
+                        <span className="font-semibold">{jugador.nombre}</span>
+                        <div className="mt-1 grid grid-cols-2 gap-1">
+                          {habilidades.map(({ clave, etiqueta }) => (
+                            <span key={clave} className="text-xs bg-gray-200 rounded px-1">
+                              {etiqueta}: {jugador[clave]}
+                            </span>
+                          ))}
+                          <span className="col-span-2 text-sm bg-blue-500 text-white rounded px-1">
+                            General: {jugador.general}
+                          </span>
+                        </div>
+                      </div>
                     ))}
                   </div>
-                  <Badge className="mt-2 text-sm" variant="default">
-                    General: {jugador.general}
-                  </Badge>
+                  <p className="mt-2 font-bold text-center">
+                    Promedio del equipo: {calcularPromedioEquipo(equipo).toFixed(2)}
+                  </p>
                 </div>
               ))}
-            </ScrollArea>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-lg bg-white/80 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-2xl text-center flex items-center justify-center">
-              <Trophy className="w-6 h-6 mr-2" />
-              Equipos Generados
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={generarEquipos} className="w-full mb-4">Generar Equipos Equilibrados</Button>
-            {equipos.length > 0 && (
-              <div className="grid gap-4">
-                {equipos.map((equipo, index) => (
-                  <Card key={index}>
-                    <CardHeader>
-                      <CardTitle>Equipo {index + 1}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ScrollArea className="h-[200px] w-full rounded-md border p-4">
-                        {equipo.map((jugador, jugadorIndex) => (
-                          <div key={jugadorIndex} className="mb-2 p-2 bg-blue-50 rounded">
-                            <span className="font-semibold">{jugador.nombre}</span>
-                            <div className="mt-1 grid grid-cols-2 gap-1">
-                              {habilidades.map(({ clave, etiqueta, icono }) => (
-                                <Badge key={clave} variant="secondary" className="text-xs flex items-center">
-                                  {icono}
-                                  <span className="ml-1">{etiqueta}: {jugador[clave]}</span>
-                                </Badge>
-                              ))}
-                              <Badge variant="default" className="col-span-2">
-                                General: {jugador.general}
-                              </Badge>
-                            </div>
-                          </div>
-                        ))}
-                      </ScrollArea>
-                      <p className="mt-4 font-bold text-center">
-                        Promedio del equipo: {calcularPromedioEquipo(equipo).toFixed(2)}
-                      </p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-export default CreadorEquiposFutbol;
+ReactDOM.render(<CreadorEquiposFutbol />, document.getElementById('root'));
+
 
