@@ -95,16 +95,23 @@ function CreadorEquiposFutbol() {
     const jugadoresOrdenados = [...jugadores].sort((a, b) => b.general - a.general);
     const equipo1 = [];
     const equipo2 = [];
-    let suma1 = 0;
-    let suma2 = 0;
 
-    jugadoresOrdenados.forEach((jugador) => {
-      if (suma1 <= suma2) {
-        equipo1.push(jugador);
-        suma1 += jugador.general;
+    jugadoresOrdenados.forEach((jugador, index) => {
+      const sumaEquipo1 = equipo1.reduce((sum, j) => sum + j.general, 0);
+      const sumaEquipo2 = equipo2.reduce((sum, j) => sum + j.general, 0);
+
+      if (index % 2 === 0) {
+        if (sumaEquipo1 <= sumaEquipo2) {
+          equipo1.push(jugador);
+        } else {
+          equipo2.push(jugador);
+        }
       } else {
-        equipo2.push(jugador);
-        suma2 += jugador.general;
+        if (sumaEquipo2 <= sumaEquipo1) {
+          equipo2.push(jugador);
+        } else {
+          equipo1.push(jugador);
+        }
       }
     });
 
@@ -224,3 +231,5 @@ function CreadorEquiposFutbol() {
 }
 
 ReactDOM.render(<CreadorEquiposFutbol />, document.getElementById('root'));
+
+
