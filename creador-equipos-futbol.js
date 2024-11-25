@@ -128,7 +128,7 @@ function App() {
 
   const calcularProbabilidadGanar = (equipo, totalEquipos) => {
     const promedioEquipo = calcularPromedioEquipo(equipo);
-    return (promedioEquipo / 10) * (100 / totalEquipos);
+    return Math.round((promedioEquipo / 10) * 100);
   };
 
   const generarEquipos = () => {
@@ -242,7 +242,7 @@ function App() {
                 </div>
                 <div className="mb-4">
                   <p className="text-lg font-semibold text-blue-800">Probabilidad de ganar:</p>
-                  <StarRating rating={calcularProbabilidadGanar(equipo, equipos.length) / 20} />
+                  <p className="text-2xl font-bold text-green-600">{calcularProbabilidadGanar(equipo, equipos.length)}%</p>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {equipo.map((jugador, jugadorIndex) => (
@@ -251,9 +251,6 @@ function App() {
                         <img src={jugador.imagen} alt={jugador.nombre} className="w-full h-full object-cover" />
                       </div>
                       <h3 className="font-bold text-sm text-center text-blue-800">{jugador.nombre}</h3>
-                      <div className="mt-2">
-                        <StarRating rating={calcularPromedioJugador(jugador) / 2} />
-                      </div>
                     </div>
                   ))}
                 </div>
@@ -268,5 +265,3 @@ function App() {
 
 ReactDOM.render(<App />, document.getElementById('root'));
 
-
-ReactDOM.render(<CreadorEquiposFutbol />, document.getElementById('root'));
