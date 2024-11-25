@@ -1,4 +1,6 @@
-const { useState, useEffect } = React;
+import { Star, StarHalf } from 'lucide-react'
+import React from 'react';
+import ReactDOM from 'react-dom';
 
 const habilidades = [
   { clave: 'pase', etiqueta: 'Pase', icono: '🦶' },
@@ -32,74 +34,107 @@ const jugadoresLegendarios = [
   { nombre: 'Kaka', imagen: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Kak%C3%A1_visited_Stadium_St._Petersburg.jpg/640px-Kak%C3%A1_visited_Stadium_St._Petersburg.jpg' }
 ];
 
+function StarRating({ rating, maxRating = 5 }) {
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.5;
 
-function CreadorEquiposFutbol() {
-  const [jugadores, setJugadores] = useState([]);
-  const [nuevoJugador, setNuevoJugador] = useState({
+  return (
+    <div className="flex">
+      {[...Array(maxRating)].map((_, i) => {
+        if (i < fullStars) {
+          return <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />;
+        } else if (i === fullStars && hasHalfStar) {
+          return <StarHalf key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />;
+        } else {
+          return <Star key={i} className="w-5 h-5 text-gray-300" />;
+        }
+      })}
+    </div>
+  );
+}
+
+function App() {
+  const [jugadores, setJugadores] = React.useState([]);
+  const [nuevoJugador, setNuevoJugador] = React.useState({
     nombre: '',
-    pase: 1,
-    tiro: 1,
-    regate: 1,
-    defensa: 1,
-    arquero: 1,
-    estadoFisico: 1,
-    general: 0,
-    imagen: ''
+    pase: 5,
+    tiro: 5,
+    regate: 5,
+    defensa: 5,
+    arquero: 5,
+    estadoFisico: 5,
   });
-  const [equipos, setEquipos] = useState([]);
-  const [imagenesDisponibles, setImagenesDisponibles] = useState([...jugadoresLegendarios]);
+  const [equipos, setEquipos] = React.useState([]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const jugadoresGuardados = localStorage.getItem('jugadores');
     if (jugadoresGuardados) {
       setJugadores(JSON.parse(jugadoresGuardados));
+    } else {
+      fetch('jugadores.json')
+        .then(response => response.json())
+        .then(data => {
+          const jugadoresConImagen = data.jugadores.map(jugador => ({
+            ...jugador,
+            imagen: jugadoresLegendarios[Math.floor(Math.random() * jugadoresLegendarios.length)].imagen
+          }));
+          setJugadores(jugadoresConImagen);
+          localStorage.setItem('jugadores', JSON.stringify(jugadoresConImagen));
+        })
+        .catch(error => console.error('Error al cargar los jugadores:', error));
     }
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     localStorage.setItem('jugadores', JSON.stringify(jugadores));
   }, [jugadores]);
 
   const manejarCambioInput = (nombre, valor) => {
-    setNuevoJugador(prev => {
-      const jugadorActualizado = { ...prev, [nombre]: nombre === 'nombre' ? valor : Math.round(Number(valor)) };
-      const { pase, tiro, regate, defensa, arquero, estadoFisico } = jugadorActualizado;
-      jugadorActualizado.general = Math.round(((pase + tiro + regate + defensa + arquero + estadoFisico) / 6) * 10);
-      return jugadorActualizado;
-    });
+    setNuevoJugador(prev => ({
+      ...prev,
+      [nombre]: nombre === 'nombre' ? valor : Math.round(Number(valor))
+    }));
   };
 
   const agregarJugador = () => {
     if (nuevoJugador.nombre) {
-      let imagenAsignada;
-      if (imagenesDisponibles.length > 0) {
-        const indiceAleatorio = Math.floor(Math.random() * imagenesDisponibles.length);
-        imagenAsignada = imagenesDisponibles[indiceAleatorio];
-        setImagenesDisponibles(prev => prev.filter((_, index) => index !== indiceAleatorio));
-      } else {
-        imagenAsignada = jugadoresLegendarios[Math.floor(Math.random() * jugadoresLegendarios.length)];
-      }
-
-      const jugadorConImagen = { ...nuevoJugador, imagen: imagenAsignada.imagen };
+      const jugadorConImagen = {
+        ...nuevoJugador,
+        imagen: jugadoresLegendarios[Math.floor(Math.random() * jugadoresLegendarios.length)].imagen
+      };
       setJugadores(prev => [...prev, jugadorConImagen]);
       setNuevoJugador({
         nombre: '',
-        pase: 1,
-        tiro: 1,
-        regate: 1,
-        defensa: 1,
-        arquero: 1,
-        estadoFisico: 1,
-        general: 0,
-        imagen: ''
+        pase: 5,
+        tiro: 5,
+        regate: 5,
+        defensa: 5,
+        arquero: 5,
+        estadoFisico: 5,
       });
     }
   };
 
+  const calcularPromedioJugador = (jugador) => {
+    const habilidades = ['pase', 'tiro', 'regate', 'defensa', 'arquero', 'estadoFisico'];
+    const suma = habilidades.reduce((acc, hab) => acc + jugador[hab], 0);
+    return suma / habilidades.length;
+  };
+
+  const calcularPromedioEquipo = (equipo) => {
+    const suma = equipo.reduce((acc, jugador) => acc + calcularPromedioJugador(jugador), 0);
+    return equipo.length > 0 ? suma / equipo.length : 0;
+  };
+
+  const calcularProbabilidadGanar = (equipo, totalEquipos) => {
+    const promedioEquipo = calcularPromedioEquipo(equipo);
+    return (promedioEquipo / 10) * (100 / totalEquipos);
+  };
+
   const generarEquipos = () => {
-    const jugadoresOrdenados = [...jugadores].sort((a, b) => b.general - a.general);
-    let equipo1 = [];
-    let equipo2 = [];
+    const jugadoresOrdenados = [...jugadores].sort((a, b) => calcularPromedioJugador(b) - calcularPromedioJugador(a));
+    const equipo1 = [];
+    const equipo2 = [];
 
     jugadoresOrdenados.forEach((jugador, index) => {
       if (index % 2 === 0) {
@@ -109,67 +144,7 @@ function CreadorEquiposFutbol() {
       }
     });
 
-    const calcularDiferenciaTotal = (eq1, eq2) => {
-      const diferenciaPromedio = Math.abs(calcularPromedioEquipo(eq1) - calcularPromedioEquipo(eq2));
-      return diferenciaPromedio;
-    };
-
-    let mejorDiferencia = calcularDiferenciaTotal(equipo1, equipo2);
-    let mejora = true;
-    let iteraciones = 0;
-    const maxIteraciones = 1000;
-
-    while (mejora && iteraciones < maxIteraciones) {
-      mejora = false;
-      iteraciones++;
-
-      for (let i = 0; i < equipo1.length; i++) {
-        for (let j = 0; j < equipo2.length; j++) {
-          const nuevoEquipo1 = [...equipo1];
-          const nuevoEquipo2 = [...equipo2];
-          [nuevoEquipo1[i], nuevoEquipo2[j]] = [nuevoEquipo2[j], nuevoEquipo1[i]];
-
-          const nuevaDiferencia = calcularDiferenciaTotal(nuevoEquipo1, nuevoEquipo2);
-
-          if (nuevaDiferencia < mejorDiferencia) {
-            equipo1 = nuevoEquipo1;
-            equipo2 = nuevoEquipo2;
-            mejorDiferencia = nuevaDiferencia;
-            mejora = true;
-            break;
-          }
-        }
-        if (mejora) break;
-      }
-    }
-
     setEquipos([equipo1, equipo2]);
-  };
-
-  const calcularPromedioEquipo = (equipo) => {
-    const suma = equipo.reduce((acc, jugador) => acc + jugador.general, 0);
-    return equipo.length > 0 ? suma / equipo.length : 0;
-  };
-
-  const ImagenJugador = ({ src, alt, className }) => {
-    const [error, setError] = useState(false);
-
-    if (error) {
-      return (
-        <div className={`${className} flex items-center justify-center bg-gray-300 text-gray-600`}>
-          {alt.charAt(0).toUpperCase()}
-        </div>
-      );
-    }
-
-    return (
-      <img
-        src={src}
-        alt={alt}
-        className={className}
-        onError={() => setError(true)}
-      />
-    );
   };
 
   return (
@@ -178,7 +153,7 @@ function CreadorEquiposFutbol() {
         <h1 className="text-5xl font-bold mb-8 text-center text-blue-800 flex items-center justify-center">
           <span className="mr-2">⚽</span> Igor/Nico 2025 <span className="ml-2">⚽</span>
         </h1>
-        
+
         <div className="mb-8 bg-blue-100 rounded-lg shadow-md p-6 border-2 border-blue-300">
           <h2 className="text-3xl font-semibold mb-4 text-center text-blue-800">Agregar Jugador</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -229,9 +204,19 @@ function CreadorEquiposFutbol() {
             {jugadores.map((jugador, index) => (
               <div key={index} className="bg-white rounded-lg shadow-lg p-4 hover:shadow-xl transition duration-300 ease-in-out flex flex-col items-center justify-center border-2 border-blue-200">
                 <div className="w-24 h-24 rounded-full overflow-hidden mb-2 border-4 border-yellow-400">
-                  <ImagenJugador src={jugador.imagen} alt={jugador.nombre} className="w-full h-full object-cover" />
+                  <img src={jugador.imagen} alt={jugador.nombre} className="w-full h-full object-cover" />
                 </div>
                 <h3 className="font-bold text-lg text-center text-blue-800">{jugador.nombre}</h3>
+                <div className="mt-2 text-sm text-gray-600">
+                  {habilidades.map(({ clave, icono }) => (
+                    <div key={clave}>
+                      {icono} {jugador[clave]}
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-2">
+                  <StarRating rating={calcularPromedioJugador(jugador) / 2} />
+                </div>
               </div>
             ))}
           </div>
@@ -251,14 +236,24 @@ function CreadorEquiposFutbol() {
             {equipos.map((equipo, equipoIndex) => (
               <div key={equipoIndex} className="bg-blue-100 rounded-lg shadow-md p-6 border-2 border-blue-300">
                 <h2 className="text-3xl font-semibold mb-4 text-center text-blue-800">Equipo {equipoIndex + 1}</h2>
+                <div className="mb-4">
+                  <p className="text-lg font-semibold text-blue-800">Promedio del equipo:</p>
+                  <StarRating rating={calcularPromedioEquipo(equipo) / 2} />
+                </div>
+                <div className="mb-4">
+                  <p className="text-lg font-semibold text-blue-800">Probabilidad de ganar:</p>
+                  <StarRating rating={calcularProbabilidadGanar(equipo, equipos.length) / 20} />
+                </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {equipo.map((jugador, jugadorIndex) => (
                     <div key={jugadorIndex} className="bg-white rounded-lg shadow-lg p-4 hover:shadow-xl transition duration-300 ease-in-out flex flex-col items-center justify-center border-2 border-blue-200">
                       <div className="w-16 h-16 rounded-full overflow-hidden mb-2 border-2 border-yellow-400">
-                        <ImagenJugador src={jugador
-.imagen} alt={jugador.nombre} className="w-full h-full object-cover" />
+                        <img src={jugador.imagen} alt={jugador.nombre} className="w-full h-full object-cover" />
                       </div>
                       <h3 className="font-bold text-sm text-center text-blue-800">{jugador.nombre}</h3>
+                      <div className="mt-2">
+                        <StarRating rating={calcularPromedioJugador(jugador) / 2} />
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -270,5 +265,8 @@ function CreadorEquiposFutbol() {
     </div>
   );
 }
+
+ReactDOM.render(<App />, document.getElementById('root'));
+
 
 ReactDOM.render(<CreadorEquiposFutbol />, document.getElementById('root'));
