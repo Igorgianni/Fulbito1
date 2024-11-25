@@ -25,21 +25,33 @@ function CreadorEquiposFutbol() {
   const [jugadoresGuardados, setJugadoresGuardados] = useState([]);
 
   useEffect(() => {
-    const jugadoresAlmacenados = localStorage.getItem('jugadores');
-    if (jugadoresAlmacenados) {
-      setJugadores(JSON.parse(jugadoresAlmacenados));
+    try {
+      const jugadoresAlmacenados = localStorage.getItem('jugadores');
+      if (jugadoresAlmacenados) {
+        setJugadores(JSON.parse(jugadoresAlmacenados));
+      }
+      actualizarListaJugadoresGuardados();
+    } catch (error) {
+      console.error("Error al cargar jugadores:", error);
     }
-    actualizarListaJugadoresGuardados();
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('jugadores', JSON.stringify(jugadores));
-    actualizarListaJugadoresGuardados();
+    try {
+      localStorage.setItem('jugadores', JSON.stringify(jugadores));
+      actualizarListaJugadoresGuardados();
+    } catch (error) {
+      console.error("Error al guardar jugadores:", error);
+    }
   }, [jugadores]);
 
   const actualizarListaJugadoresGuardados = () => {
-    const nombres = JSON.parse(localStorage.getItem('jugadores') || '[]').map(j => j.nombre);
-    setJugadoresGuardados(nombres);
+    try {
+      const nombres = JSON.parse(localStorage.getItem('jugadores') || '[]').map(j => j.nombre);
+      setJugadoresGuardados(nombres);
+    } catch (error) {
+      console.error("Error al actualizar lista de jugadores guardados:", error);
+    }
   };
 
   const manejarCambioInput = (nombre, valor) => {
@@ -249,6 +261,8 @@ function CreadorEquiposFutbol() {
   );
 }
 
-ReactDOM.render(<CreadorEquiposFutbol />, document.getElementById('root'));
-
+// Asegúrate de que el DOM esté completamente cargado antes de renderizar
+document.addEventListener('DOMContentLoaded', () => {
+  ReactDOM.render(<CreadorEquiposFutbol />, document.getElementById('root'));
+});
 
